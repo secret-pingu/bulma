@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dagdoel App</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+</head>
+<body class="has-background-dark has-text-white">
+
+  <div class="container" style="max-width: 500px; margin-top: 1rem;">
+    <div class="tabs is-toggle is-fullwidth mb-4">
+      <ul>
+        <li class="is-active" id="tab-today"><a>Vandaag</a></li>
+        <li id="tab-student"><a>Student</a></li>
+        <li id="tab-coach"><a>Coach</a></li>
+      </ul>
+    </div>
+
+    <section id="today-screen">
+      <h1 class="title is-4">Doelen van vandaag</h1>
+      <div id="today-list"></div>
+    </section>
+
+    <section id="student-screen" class="is-hidden">
+      <h1 class="title is-4">Mijn dagdoel invullen</h1>
+      <div class="card">
+        <div class="card-content">
+          <form id="goal-form">
+            <div class="field">
+              <label class="label">Doel</label>
+              <div class="control">
+                <input class="input" id="goal-input" type="text" placeholder="Bijv. hoofdstuk 3 leren" required>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Starttijd</label>
+              <div class="control">
+                <input class="input" id="start-input" type="time" required>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Eindtijd</label>
+              <div class="control">
+                <input class="input" id="end-input" type="time" required>
+              </div>
+            </div>
+            <div class="field is-grouped is-grouped-right">
+              <p class="control">
+                <button type="submit" class="button is-primary">Versturen</button>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section id="coach-screen" class="is-hidden">
+      <h1 class="title is-4">Goedkeuring dagdoelen</h1>
+      <div id="coach-list"></div>
+    </section>
+  </div>
+
+  <figure class="image is-16x16" style="position: fixed; bottom: 10px; left: 10px; opacity: 0.9;">
+    <img src="karel.webp" alt="karel">
+  </figure>
+
+  <footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+      <p>
+        <strong>Dagdoel App</strong> door Boaz van Hemsbergen. <br>
+        © 2025 Alle rechten voorbehouden.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    const tabs = document.querySelectorAll(".tabs ul li");
+    const screens = {
+      "tab-today": document.getElementById("today-screen"),
+      "tab-student": document.getElementById("student-screen"),
+      "tab-coach": document.getElementById("coach-screen"),
+    };
+
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => t.classList.remove("is-active"));
+        tab.classList.add("is-active");
+        Object.values(screens).forEach(s => s.classList.add("is-hidden"));
+        screens[tab.id].classList.remove("is-hidden");
+      });
+    });
+
+    const form = document.getElementById("goal-form");
+    const coachList = document.getElementById("coach-list");
+    const todayList = document.getElementById("today-list");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const goal = document.getElementById("goal-input").value;
+      const start = document.getElementById("start-input").value;
+      const end = document.getElementById("end-input").value;
+
+      const card = document.createElement("div");
+      card.className = "card mb-3";
+      card.innerHTML = `
+        <div class="card-content">
+          <p><strong>Student:</strong> Boaz</p>
+          <p><strong>Doel:</strong> ${goal}</p>
+          <p><strong>Tijd:</strong> ${start} - ${end}</p>
+        </div>
+        <footer class="card-footer">
+          <a class="card-footer-item has-text-success">Goedkeuren</a>
+          <a class="card-footer-item has-text-danger">Afkeuren</a>
+        </footer>
+      `;
+
+      const [approveBtn, denyBtn] = card.querySelectorAll(".card-footer-item");
+
+      approveBtn.addEventListener("click", () => {
+        card.classList.remove("has-background-danger-light");
+        card.classList.add("has-background-success-light");
+
+        const todayCard = document.createElement("div");
+        todayCard.className = "card mb-3";
+        todayCard.innerHTML = `
+          <div class="card-content">
+            <p class="title is-6">Nieuw doel</p>
+            <p>Doel: ${goal}</p>
+            <p>Tijd: ${start} - ${end}</p>
+          </div>
+        `;
+        todayList.appendChild(todayCard);
+
+        card.remove();
+        alert("Doel is goedgekeurd en toegevoegd aan 'Vandaag'");
+      });
+
+      denyBtn.addEventListener("click", () => {
+        card.classList.remove("has-background-success-light");
+        card.classList.add("has-background-danger-light");
+      });
+
+      coachList.appendChild(card);
+      form.reset();
+
+      tabs.forEach(t => t.classList.remove("is-active"));
+      document.getElementById("tab-coach").classList.add("is-active");
+      Object.values(screens).forEach(s => s.classList.add("is-hidden"));
+      screens["tab-coach"].classList.remove("is-hidden");
+    });
+  </script>
+
+</body>
+</html>
